@@ -21,7 +21,7 @@ RUN composer install --no-dev --optimize-autoloader
 CMD php artisan migrate --force && php artisan db:seed --force && php artisan serve --host=0.0.0.0 --port=${PORT:-8000}
 
 # Make the script executable
-RUN chmod +x start.sh
+RUN chmod +x /var/www/html/start.sh
 
 # Run the script when the container launches
-CMD ["./start.sh"]
+CMD ["/var/www/html/start.sh"]
