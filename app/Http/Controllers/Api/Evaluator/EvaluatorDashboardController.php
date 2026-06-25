@@ -31,7 +31,7 @@ class EvaluatorDashboardController extends Controller
                 'id' => $project->id,
                 'title' => $project->title,
                 'unit_center' => $project->unit_center ?? 'Unassigned Unit',
-                'status' => $evaluation->status,
+                'status' => $evaluation ? $evaluation->status: 'pending',
                 'score' => $evaluation ? $evaluation->final_calculated_score : null,
                 'evaluated_at' => $evaluation ? $evaluation->created_at->format('M d, Y') : null,
             ];
