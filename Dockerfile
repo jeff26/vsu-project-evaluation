@@ -18,4 +18,4 @@ COPY . .
 RUN composer install --no-dev --optimize-autoloader
 
 # 7. Migrate the TiDB database and boot the built-in Laravel server on the port Render assigns
-CMD php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=${PORT:-8000}
+CMD php artisan migrate --force && php artisan db:seed --force && php artisan serve --host=0.0.0.0 --port=${PORT:-8000}
