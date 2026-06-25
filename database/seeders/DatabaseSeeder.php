@@ -13,17 +13,19 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // 1. Create an Admin User
-        User::updateOrCreate([
+        User::updateOrCreate(
+            ['email' => 'admin@test.com',],
+            [
             'name' => 'System Admin',
-            'email' => 'admin@test.com',
             'password' => Hash::make('secret'),
             'role' => 'admin',
         ]);
 
         // 2. Create an Evaluator User
-        $evaluator = User::updateOrCreate([
+        $evaluator = User::updateOrCreate(
+            ['email' => 'evaluator@test.com'],
+            [
             'name' => 'John Evaluator',
-            'email' => 'evaluator@test.com',
             'password' => Hash::make('secret'),
             'role' => 'evaluator',
         ]);
