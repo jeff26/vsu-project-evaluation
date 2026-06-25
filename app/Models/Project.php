@@ -17,6 +17,7 @@ class Project extends Model
         'title',
         'project_thrusts_id',
         'unit_center',
+        'attachment_path'
     ];
 
     /**

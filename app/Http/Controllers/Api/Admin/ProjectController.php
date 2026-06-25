@@ -7,6 +7,7 @@ use App\Models\Project; // Ensure you have a Project model created
 use App\Models\ProjectTrust;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Storage;
 
 class ProjectController extends Controller
 {
@@ -43,16 +44,26 @@ class ProjectController extends Controller
     public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'title'       => 'required|string|max:1000',
-            'project_thrusts_id'      => 'required',
-            'unit_center' => 'nullable|string|max:255',
+            'title'              => 'required|string|max:1000',
+            'project_thrusts_id' => 'required',
+            'unit_center'        => 'nullable|string|max:255',
+            'attachment'         => 'nullable|file|mimes:pdf|max:10240', // Validates it is a PDF under 10MB
         ]);
 
-        $project = Project::create([
-            'title'       => $validated['title'],
-            'project_thrusts_id'      => $validated['project_thrusts_id'],
-            'unit_center' => $validated['unit_center'] ?? 'Unassigned Center',
-        ]);
+        // Prepare the basic text payload
+        $data = [
+            'title'              => $validated['title'],
+            'project_thrusts_id' => $validated['project_thrusts_id'],
+            'unit_center'        => $validated['unit_center'] ?? 'Unassigned Center',
+        ];
+
+        // Handle the file upload if one exists
+        if ($request->hasFile('attachment')) {
+            // Stores the file in storage/app/public/project_attachments
+            $data['attachment_path'] = $request->file('attachment')->store('project_attachments', 'public');
+        }
+
+        $project = Project::create($data);
 
         return response()->json([
             'status'  => 'success',
@@ -76,16 +87,30 @@ class ProjectController extends Controller
         }
 
         $validated = $request->validate([
-            'title'       => 'required|string|max:1000',
-            'project_thrusts_id'      => 'required',
-            'unit_center' => 'nullable|string|max:255',
+            'title'              => 'required|string|max:1000',
+            'project_thrusts_id' => 'required',
+            'unit_center'        => 'nullable|string|max:255',
+            'attachment'         => 'nullable|file|mimes:pdf|max:10240',
         ]);
 
-        $project->update([
-            'title'       => $validated['title'],
-            'project_thrusts_id'      => $validated['project_thrusts_id'],
-            'unit_center' => $validated['unit_center'] ?? 'Unassigned Center',
-        ]);
+        $data = [
+            'title'              => $validated['title'],
+            'project_thrusts_id' => $validated['project_thrusts_id'],
+            'unit_center'        => $validated['unit_center'] ?? 'Unassigned Center',
+        ];
+
+        // Handle file replacement
+        if ($request->hasFile('attachment')) {
+            // Delete the old file from the server to save space
+            if ($project->attachment_path) {
+                Storage::disk('public')->delete($project->attachment_path);
+            }
+
+            // Save the new file
+            $data['attachment_path'] = $request->file('attachment')->store('project_attachments', 'public');
+        }
+
+        $project->update($data);
 
         return response()->json([
             'status'  => 'success',

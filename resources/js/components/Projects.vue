@@ -62,6 +62,7 @@
                         <th class="py-3.5 px-6">Project Context Details</th>
                         <th class="py-3.5 px-6">VSU iCare Program thrust</th>
                         <th class="py-3.5 px-6">Implementing Unit</th>
+                        <th class="py-3.5 px-6">Annual Report</th>
                         <th class="py-3.5 px-6 text-right">System Management Actions</th>
                     </tr>
                     </thead>
@@ -69,41 +70,6 @@
                     <tr v-for="project in projects" :key="project.id" class="hover:bg-slate-50/60 transition-colors">
                         <td class="py-4 px-6 max-w-md vertical-align-top">
                             <div class="font-bold text-slate-900 truncate" :title="project.title">{{ project.title }}</div>
-
-                            <div class="mt-1.5 flex items-center">
-                                <button
-                                    v-if="project.evaluators && project.evaluators.length > 0"
-                                    @click="toggleEvaluators(project.id)"
-                                    class="inline-flex items-center text-[11px] font-bold text-slate-500 hover:text-emerald-800 transition-colors cursor-pointer focus:outline-hidden space-x-1"
-                                >
-                                    <svg
-                                        class="w-3 h-3 transform transition-transform duration-200 text-slate-400"
-                                        :class="{ 'rotate-90 text-emerald-700': isExpanded(project.id) }"
-                                        fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                                    >
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path>
-                                    </svg>
-                                    <span>{{ isExpanded(project.id) ? 'Hide Committee List' : `View Committee (${project.evaluators.length})` }}</span>
-                                </button>
-                                <span v-else class="text-[10px] text-slate-400 font-medium">No evaluators assigned</span>
-                            </div>
-
-                            <div
-                                v-if="project.evaluators && project.evaluators.length > 0 && isExpanded(project.id)"
-                                class="flex flex-wrap gap-1.5 mt-2 p-2 bg-slate-50 rounded-lg border border-slate-200/60 animate-fade-in"
-                            >
-                                <span
-                                    v-for="ev in project.evaluators"
-                                    :key="ev.id"
-                                    :title="ev.email"
-                                    class="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide bg-emerald-50 text-emerald-800 border border-emerald-100 px-2 py-0.5 rounded-md shadow-2xs"
-                                >
-                                    <svg class="w-2.5 h-2.5 text-emerald-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
-                                    </svg>
-                                    {{ ev.name }}
-                                </span>
-                            </div>
                         </td>
 
                         <td class="py-4 px-6">
@@ -116,25 +82,23 @@
                             {{ project.unit_center || 'Unassigned Center' }}
                         </td>
 
+                        <td class="py-4 px-6">
+                            <a
+                                v-if="project.attachment_path"
+                                :href="'/storage/' + project.attachment_path"
+                                target="_blank"
+                                class="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-700 hover:text-emerald-900 bg-emerald-50 hover:bg-emerald-100 px-2 py-1.5 rounded-lg transition-colors"
+                            >
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                View PDF
+                            </a>
+                            <span v-else class="text-xs text-slate-400 italic">No file</span>
+                        </td>
+
                         <td class="py-4 px-6 text-right space-x-2 whitespace-nowrap">
-                            <button
-                                @click="openEvaluatorModal(project)"
-                                class="text-amber-700 hover:text-amber-900 bg-amber-50 hover:bg-amber-100 text-xs font-bold px-2.5 py-1.5 rounded-lg transition-colors cursor-pointer"
-                            >
-                                Panel Setup
-                            </button>
-                            <button
-                                @click="openEditModal(project)"
-                                class="text-emerald-700 hover:text-emerald-900 bg-emerald-50 hover:bg-emerald-100 text-xs font-bold px-2.5 py-1.5 rounded-lg transition-colors cursor-pointer"
-                            >
-                                Modify
-                            </button>
-                            <button
-                                @click="deleteProject(project.id)"
-                                class="text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 text-xs font-bold px-2.5 py-1.5 rounded-lg transition-colors cursor-pointer"
-                            >
-                                Delete
-                            </button>
+                            <button @click="openEvaluatorModal(project)" class="text-amber-700 hover:text-amber-900 bg-amber-50 hover:bg-amber-100 text-xs font-bold px-2.5 py-1.5 rounded-lg transition-colors cursor-pointer">Panel Setup</button>
+                            <button @click="openEditModal(project)" class="text-emerald-700 hover:text-emerald-900 bg-emerald-50 hover:bg-emerald-100 text-xs font-bold px-2.5 py-1.5 rounded-lg transition-colors cursor-pointer">Modify</button>
+                            <button @click="deleteProject(project.id)" class="text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 text-xs font-bold px-2.5 py-1.5 rounded-lg transition-colors cursor-pointer">Delete</button>
                         </td>
                     </tr>
                     </tbody>
@@ -189,6 +153,19 @@
                             placeholder="e.g., Department of Agronomy, OvRE, etc."
                             class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-hidden focus:border-emerald-600 focus:bg-white transition-all text-slate-800"
                         />
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Supporting Document (PDF)</label>
+                        <input
+                            type="file"
+                            accept="application/pdf"
+                            @change="handleFileUpload"
+                            class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-hidden focus:border-emerald-600 focus:bg-white transition-all text-slate-800 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 cursor-pointer"
+                        />
+                        <p v-if="isEditMode && form.existing_attachment" class="text-xs text-slate-500 mt-1.5">
+                            Current file: <a :href="'/storage/' + form.existing_attachment" target="_blank" class="text-emerald-600 hover:underline">View Document</a>
+                        </p>
                     </div>
 
                     <div class="pt-4 border-t border-slate-100 flex justify-end space-x-2">
@@ -263,7 +240,7 @@ const thrustOptions = ref([]);
 const isModalOpen = ref(false);
 const isEditMode = ref(false);
 const currentEditingId = ref(null);
-const form = ref({ title: '', project_thrusts_id: '', unit_center: '' });
+const form = ref({ title: '', project_thrusts_id: '', unit_center: '', attachment: null, existing_attachment: null });
 
 // Evaluator Committee Management Reactive Elements
 const isEvaluatorModalOpen = ref(false);
@@ -283,6 +260,16 @@ const toggleEvaluators = (projectId) => {
         expandedProjectIds.value = expandedProjectIds.value.filter(id => id !== projectId);
     } else {
         expandedProjectIds.value.push(projectId);
+    }
+};
+
+const handleFileUpload = (event) => {
+    const file = event.target.files[0];
+    if (file && file.type === 'application/pdf') {
+        form.value.attachment = file;
+    } else {
+        alert('Please upload a valid PDF document.');
+        event.target.value = null; // Reset the input
     }
 };
 
@@ -347,7 +334,8 @@ const openEditModal = (project) => {
     form.value = {
         title: project.title,
         project_thrusts_id: project.project_thrusts_id,
-        unit_center: project.unit_center
+        unit_center: project.unit_center,
+        existing_attachment: project.attachment_path
     };
     isModalOpen.value = true;
 };
@@ -378,13 +366,45 @@ const fetchProjects = async () => {
 
 const saveProject = async () => {
     try {
-        if (isEditMode.value) {
-            await axios.put(`/api/admin/projects/${currentEditingId.value}`, form.value, config);
-        } else {
-            await axios.post('/api/admin/projects', form.value, config);
+        // 1. Create a new FormData object (Required for sending files)
+        let formData = new FormData();
+
+        // 2. Append all standard text fields from your form state
+        formData.append('title', form.value.title);
+        formData.append('project_thrusts_id', form.value.project_thrusts_id);
+        formData.append('unit_center', form.value.unit_center);
+
+        // 3. Append the PDF file ONLY if the user actually selected one
+        if (form.value.attachment) {
+            formData.append('attachment', form.value.attachment);
         }
+
+        // 4. Set the proper headers so the server knows a file is coming
+        const config = {
+            headers: {
+                Authorization: `Bearer ${token}`,
+                Accept: 'application/json',
+                'Content-Type': 'multipart/form-data'
+            }
+        };
+
+        // 5. The Upload Logic
+        if (isEditMode.value) {
+            // LARAVEL GOTCHA: You cannot use axios.put() with multipart/form-data.
+            // You must use axios.post() and append '_method', 'PUT' to trick Laravel.
+            formData.append('_method', 'PUT');
+            const response = await axios.post(`/api/admin/projects/${currentEditingId.value}`, formData, config);
+            alert(response.data.message);
+        } else {
+            // Standard creation
+            const response = await axios.post('/api/admin/projects', formData, config);
+            alert(response.data.message);
+        }
+
+        // 6. Clean up
         await fetchProjects();
         closeModal();
+
     } catch (error) {
         console.error('Failed to save project records:', error);
     }

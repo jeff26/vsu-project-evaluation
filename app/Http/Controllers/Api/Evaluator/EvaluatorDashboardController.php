@@ -34,6 +34,7 @@ class EvaluatorDashboardController extends Controller
                 'status' => $evaluation ? $evaluation->status: 'pending',
                 'score' => $evaluation ? $evaluation->final_calculated_score : null,
                 'evaluated_at' => $evaluation ? $evaluation->created_at->format('M d, Y') : null,
+                'attachment' => $project->attachment_path,
             ];
         });
 

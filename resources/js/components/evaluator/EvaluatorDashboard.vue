@@ -77,6 +77,7 @@
                         <tr>
                             <th class="py-3 px-5">Project Operational Scope / Title</th>
                             <th class="py-3 px-5">Implementing Unit</th>
+                            <th class="py-3 px-5">Annual Report</th>
                             <th class="py-3 px-5 text-center">Audit Status</th>
                             <th class="py-3 px-5 text-right">Assigned Action</th>
                         </tr>
@@ -88,6 +89,18 @@
                             </td>
                             <td class="py-4 px-5 text-slate-500 text-xs">
                                 {{ project.unit_center }}
+                            </td>
+                            <td class="py-4 px-5">
+                                <a
+                                    v-if="project.attachment"
+                                    :href="'/storage/' + project.attachment"
+                                    target="_blank"
+                                    class="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-700 hover:text-emerald-900 bg-emerald-50 hover:bg-emerald-100 px-2 py-1.5 rounded-lg transition-colors"
+                                >
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                    View PDF
+                                </a>
+                                <span v-else class="text-xs text-slate-400 italic">No file</span>
                             </td>
                             <td class="py-4 px-5 text-center">
                                     <span v-if="project.status === 'pending'" class="inline-block bg-amber-50 text-amber-800 text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded border border-amber-200/50">

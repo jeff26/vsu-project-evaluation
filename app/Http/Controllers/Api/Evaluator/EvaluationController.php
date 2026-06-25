@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Evaluator;
 
 use App\Http\Controllers\Controller;
+use App\Models\EvaluationCriteria;
 use App\Models\Project;
 use App\Models\Evaluations;
 use App\Models\EvaluationCategories;
@@ -132,7 +133,7 @@ class EvaluationController extends Controller
                 foreach ($request->input('scores') as $scoreItem) {
 
                     // Pull specific criterion profile rules to check maximum allowed weights
-                    $criterion = DB::table('evaluation_criteria')
+                    $criterion = EvaluationCriteria::query()
                         ->where('id', $scoreItem['criterion_id'])
                         ->first();
 
