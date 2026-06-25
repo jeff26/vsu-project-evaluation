@@ -7,7 +7,7 @@
 
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 relative z-10">
                 <div>
-                    <h1 class="text-2xl font-black tracking-tight">Welcome Back, Technical Evaluator</h1>
+                    <h1 class="text-2xl font-black tracking-tight">Welcome Back, Technical Review Committee</h1>
                     <p class="text-emerald-100 text-xs mt-1 max-w-xl font-medium">
                         Visayas State University Project Evaluation Engine. Assess assigned portfolios using the structural performance criteria.
                     </p>
