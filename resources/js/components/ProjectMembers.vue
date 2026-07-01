@@ -307,6 +307,9 @@ const fetchProjectsList = async () => {
             params: { label: user.label, search: searchProject.value }
         });
         projectOptions.value = response.data.data || response.data;
+        if (response.data.length > 0) {
+            selectProject(response.data[0])
+        }
     } catch (error) {
         console.error('Failed to gather index metadata listings:', error);
     }

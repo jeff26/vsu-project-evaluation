@@ -14,16 +14,22 @@ class UserManagementController extends Controller
     // 1. LIST ALL USERS
     public function index(): JsonResponse
     {
+        // Capture the input safely
+        $label = request()->label ?? null;
+
         $users = User::select('id', 'name', 'email', 'role', 'label', 'created_at')
-            ->when(request()->label != 'admin', function ($query, $label) {
-                $query->where('label', '=', $label);
+            // Check the condition in the first parameter
+            ->when($label && $label != 'admin', function ($query) use ($label) {
+                // Now $label refers to your actual request variable
+                $query->where('label', $label);
             })
             ->latest()
             ->get();
 
         return response()->json([
             'status' => 'success',
-            'data' => $users
+            'data' => $users,
+            'label' => $label
         ], 200);
     }
 

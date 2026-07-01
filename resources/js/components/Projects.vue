@@ -281,6 +281,7 @@ const isExpanded = (projectId) => expandedProjectIds.value.includes(projectId);
 // Trigger Evaluator Overlay Configuration Map
 const openEvaluatorModal = async (project) => {
     targetProjectForEvaluator.value = project;
+    // console.log(targetProjectForEvaluator.value.project_thrusts_id);
     selectedEvaluatorIds.value = project.evaluators ? project.evaluators.map(e => e.id) : [];
     isEvaluatorModalOpen.value = true;
 
@@ -292,9 +293,12 @@ const openEvaluatorModal = async (project) => {
 // Pull all system accounts where role === 'evaluator'
 const fetchSystemEvaluators = async () => {
     try {
-        const response = await axios.get('/api/admin/users', config);
+        const response = await axios.get('/api/admin/projects/evaluators', {
+            headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' },
+            params: { thrust_id: targetProjectForEvaluator.value.project_thrusts_id }
+        });
         if (response.data.status === 'success') {
-            evaluatorsOptions.value = response.data.data.filter(u => u.role === 'evaluator');
+            evaluatorsOptions.value = response.data.data;
         }
     } catch (err) {
         console.error('Failed retrieving administrative identity catalogs:', err);

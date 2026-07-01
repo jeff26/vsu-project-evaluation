@@ -163,8 +163,11 @@ class ProjectController extends Controller
 
     public function thrusts(): \Illuminate\Http\JsonResponse
     {
+        $label = request()->label ?? null;
         // Serving standard institutional focus lines dynamically
-        $thrusts = ProjectTrust::query()->get();
+        $thrusts = ProjectTrust::query()->when($label && $label !== 'admin', function ($query) use ($label) {
+            $query->where('label', '=', $label);
+        })->get();
 
         return response()->json($thrusts, 200);
     }
@@ -173,10 +176,8 @@ class ProjectController extends Controller
     {
         $project = Project::findOrFail($id);
 
-        $validated = $request->validate([
-            'evaluator_ids'   => 'nullable|array',
-            'evaluator_ids.*' => 'exists:users,id'
-        ]);
+        // getuserid
+
 
         // sync() automatically adds new assignments and drops unselected ones cleanly
         $project->evaluators()->sync($request->input('evaluator_ids', []));
@@ -184,6 +185,21 @@ class ProjectController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Project evaluation panel configuration matrix updated.'
+        ], 200);
+    }
+
+    public function getProjectEvaluators(): JsonResponse
+    {
+        $thrust_id = request()->thrust_id;
+        $evaluators =  ProjectEvaluator::query()
+            ->leftJoin('users', 'project_evaluators.email', '=', 'users.email')
+            ->select('users.*')
+            ->where('project_evaluators.project_thrusts_id', '=', $thrust_id)
+            ->get();
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $evaluators
         ], 200);
     }
 }

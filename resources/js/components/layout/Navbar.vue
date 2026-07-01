@@ -19,7 +19,7 @@
             <div class="text-sm font-medium text-slate-600">
                 Account: <strong class="text-slate-900 font-bold">{{ user?.name }}</strong>
                 <span class="ml-1.5 inline-flex items-center px-2 py-0.5 rounded text-xs font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800">
-          {{ user?.role }}
+          {{ user?.role }} {{ user?.label }}
         </span>
             </div>
         </div>

@@ -30,8 +30,8 @@
 
             <div class="bg-white p-6 rounded-xl border border-slate-200/60 shadow-xs flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div class="space-y-1 max-w-2xl">
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded text-[10px] font-black bg-amber-50 text-amber-800 border border-amber-200 uppercase tracking-wider">
-                        Form B • DEVELOPMENT EVALUATION FORM
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded text-[12px] font-black bg-amber-50 text-amber-800 border border-amber-200 uppercase tracking-wider">
+                        {{ user.label === 'research' ? 'A • RESEARCH EVALUATION FORM' : 'Form B • DEVELOPMENT EVALUATION FORM' }}
                     </span>
                     <h2 class="text-xl font-black text-slate-800 tracking-tight leading-snug">
                         {{ projectContext?.title || 'Relational Project Record Workspace' }}
@@ -173,6 +173,8 @@ const leader = ref('');
 
 const token = localStorage.getItem('auth_token');
 const config = { headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' } };
+const userProfile = localStorage.getItem('user_profile');
+const user = userProfile ? JSON.parse(userProfile) : null;
 
 // Dynamic Math Reducer Aggregators
 const getSubtotal = (criteriaList) => {

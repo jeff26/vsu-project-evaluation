@@ -28,7 +28,7 @@ class ProjectThrustController extends Controller
             ->latest()
             ->get();
 
-        return response()->json($thrusts, 200); // 200 is standard for successful GET
+        return response()->json($thrusts, 200);
     }
 
     /**

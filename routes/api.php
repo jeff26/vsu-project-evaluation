@@ -25,6 +25,7 @@ Route::middleware(['auth:sanctum'])->prefix('admin')->group(function () {
     Route::delete('/evaluators/{id}', [ProjectEvaluatorController::class, 'destroy']);
 
     Route::post('projects/{id}/assign-evaluators', [ProjectController::class, 'assignEvaluators']);
+    Route::get('projects/evaluators', [ProjectController::class, 'getProjectEvaluators']);
 
     Route::get('dashboard', [DashboardController::class, 'index']);
 

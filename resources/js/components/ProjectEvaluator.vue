@@ -150,6 +150,9 @@ const fetchThrustsList = async () => {
             params: { label: user.label }
         });
         thrustOptions.value = response.data.data || response.data;
+        if (response.data.length > 0) {
+            selectThrust(response.data[0])
+        }
     } catch (error) { console.error(error); }
 };
 

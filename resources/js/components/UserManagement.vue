@@ -131,7 +131,10 @@ const user = JSON.parse(localStorage.getItem('user_profile')) || null;
 const fetchUsers = async () => {
     try {
         loading.value = true;
-        const response = await axios.get('/api/admin/users', { headers: { Authorization: `Bearer ${token}` }, params: { label: user.label } });
+        const response = await axios.get('/api/admin/users', {
+            headers: { Authorization: `Bearer ${token}` },
+            params: { label: user.label }
+        });
         if (response.data.status === 'success') users.value = response.data.data;
     } catch (err) {
         console.error('Failed processing index arrays:', err);
@@ -144,12 +147,12 @@ const openCreateModal = () => {
     showModal.value = true;
 };
 
-const openEditModal = (user) => {
-    isEvaluator = user.role === 'evaluator';
+const openEditModal = (users) => {
+    isEvaluator = users.role === 'evaluator';
     // console.log(isEvaluator);
     isEditMode.value = true;
     targetUserId.value = user.id;
-    form.value = { name: user.name, email: user.email, password: '', role: user.role, label: user.label };
+    form.value = { name: users.name, email: users.email, password: '', role: users.role, label: users.label };
     showModal.value = true;
 };
 
