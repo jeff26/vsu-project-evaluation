@@ -45,7 +45,7 @@ class ProjectMemberController extends Controller
             'project_id' => 'required|exists:projects,id',
             'name'       => 'required|string|max:255',
             'email'      => 'required|email|max:255', // Changed to nullable
-            'role'       => 'required|in:leader,member', // Enforced enum limits
+            'role'       => 'required|in:Program leader,Project member,Project leader,Component leader,Study leader,Project staff', // Enforced enum limits
         ]);
 
         $member = ProjectMember::create($validated);
@@ -72,7 +72,7 @@ class ProjectMemberController extends Controller
             'project_id' => 'required|exists:projects,id',
             'name'       => 'required|string|max:255',
             'email'      => 'required|email|max:255', // Changed to nullable
-            'role'       => 'required|in:leader,member', // Enforced enum limits
+            'role'       => 'required|in:Program leader,Project member,Project leader,Component leader,Study leader,Project staff', // Enforced enum limits
         ]);
 
         $member->update($validated);

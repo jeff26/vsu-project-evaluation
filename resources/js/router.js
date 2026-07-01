@@ -8,6 +8,7 @@ import ProjectMembers from "./components/ProjectMembers.vue";
 import EvaluatorDashboard from './components/evaluator/EvaluatorDashboard.vue';
 import EvaluateView from "./components/evaluator/EvaluateView.vue";
 import UserManagement from './components/UserManagement.vue';
+import Evaluators from './components/ProjectEvaluator.vue';
 
 const routes = [
     {
@@ -40,6 +41,11 @@ const routes = [
                 path: 'proponents',
                 name: 'admin.proponents',
                 component: ProjectMembers // Injected into layout's AppMain router-view
+            },
+            {
+                path: 'evaluators',
+                name: 'admin.evaluators',
+                component: Evaluators // Injected into layout's AppMain router-view
             },
             {
                 path: 'users',

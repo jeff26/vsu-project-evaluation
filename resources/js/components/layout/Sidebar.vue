@@ -49,6 +49,16 @@
                     <span>Project proponents</span>
                 </router-link>
                 <router-link
+                    to="/admin/evaluators"
+                    active-class="bg-emerald-900/60 text-amber-300 font-semibold border-l-4 border-amber-500 shadow-inner"
+                    class="flex items-center space-x-3 px-4 py-3 rounded-lg text-slate-400 hover:bg-emerald-900/30 hover:text-slate-200 border-l-4 border-transparent transition-all duration-150"
+                >
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
+                    </svg>
+                    <span>Project evaluators</span>
+                </router-link>
+                <router-link
                     to="/admin/users"
                     active-class="bg-emerald-900/60 text-amber-300 font-semibold border-l-4 border-amber-500 shadow-inner"
                     class="flex items-center space-x-3 px-4 py-3 rounded-lg text-slate-400 hover:bg-emerald-900/30 hover:text-slate-200 border-l-4 border-transparent transition-all duration-150"

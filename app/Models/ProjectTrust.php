@@ -24,6 +24,7 @@ class ProjectTrust extends Model
      */
     protected $fillable = [
         'name', // Maps to your string column name (e.g., 'name' or 'title')
+        'label'
     ];
 
     public function projects(): \Illuminate\Database\Eloquent\Relations\HasMany

@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('evaluator_id')->constrained('users')->onDelete('cascade');
             $table->text('comments')->nullable();
             $table->decimal('final_calculated_score', 5, 2)->nullable(); // Stores computed final grade
-            $table->enum('status', ['pending', 'completed'])->default('pending');
+            $table->enum('status', ['pending', 'completed', 'draft'])->default('pending');
             $table->timestamps();
         });
     }

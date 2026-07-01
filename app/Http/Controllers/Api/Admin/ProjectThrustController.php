@@ -14,18 +14,21 @@ class ProjectThrustController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $thrusts = ProjectTrust::query()
-            // Automatically appends an internal count column: projects_count
-            ->withCount(['projects'])
+        $label = $request->input('label') ?? null;
 
-            // 🌟 Use when() to filter by name if search input is filled
+        $thrusts = ProjectTrust::query()
+            ->withCount(['projects'])
             ->when($request->input('search'), function ($query, $search) {
                 $query->where('name', 'like', "%{$search}%");
+            })
+            // 🌟 Use 'use ($label)' to pass the variable into the closure
+            ->when($label && $label !== 'admin', function ($query) use ($label) {
+                $query->where('label', '=', $label);
             })
             ->latest()
             ->get();
 
-        return response()->json($thrusts, 201);
+        return response()->json($thrusts, 200); // 200 is standard for successful GET
     }
 
     /**
@@ -35,10 +38,12 @@ class ProjectThrustController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255|unique:project_thrusts,name',
+            'label' => 'required'
         ]);
 
         $thrust = ProjectTrust::create([
-            'name' => $validated['name']
+            'name' => $validated['name'],
+            'label' => $validated['label']
         ]);
 
         return response()->json([
@@ -65,10 +70,12 @@ class ProjectThrustController extends Controller
         // Validate uniqueness but ignore the record we are currently updating
         $validated = $request->validate([
             'name' => 'required|string|max:255|unique:project_thrusts,name,' . $id,
+            'label' => 'required'
         ]);
 
         $thrust->update([
-            'name' => $validated['name']
+            'name' => $validated['name'],
+            'label' => $validated['label']
         ]);
 
         return response()->json([

@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Project; // Ensure you have a Project model created
+use App\Models\ProjectEvaluator;
 use App\Models\ProjectTrust;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Storage;
@@ -16,7 +18,7 @@ class ProjectController extends Controller
      */
     public function index(): JsonResponse
     {
-       // var_dump(request()->all());
+       $label = request()->label ?? null;
         // Fetch projects ordered by the latest entries
         $projects = Project::query()
             ->with(['thrust','evaluators']) // Eager load your thrust relationship data matrix
@@ -29,6 +31,10 @@ class ProjectController extends Controller
             // 🌟 Filter by relation foreign key if 'thrust_id' variable is passed
             ->when(request()->thrust_id, function ($query, $thrustId) {
                 $query->where('project_thrusts_id', $thrustId);
+            })
+
+            ->when($label && $label !== 'admin', function ($query) use ($label) {
+                $query->where('label', '=', $label);
             })
 
             ->latest()
@@ -48,6 +54,7 @@ class ProjectController extends Controller
             'project_thrusts_id' => 'required',
             'unit_center'        => 'nullable|string|max:255',
             'attachment'         => 'nullable|file|mimes:pdf|max:10240', // Validates it is a PDF under 10MB
+            'label'         => 'required'
         ]);
 
         // Prepare the basic text payload
@@ -55,6 +62,7 @@ class ProjectController extends Controller
             'title'              => $validated['title'],
             'project_thrusts_id' => $validated['project_thrusts_id'],
             'unit_center'        => $validated['unit_center'] ?? 'Unassigned Center',
+            'label'        => $validated['label'],
         ];
 
         // Handle the file upload if one exists
@@ -64,6 +72,18 @@ class ProjectController extends Controller
         }
 
         $project = Project::create($data);
+        // Find all Evaluator profiles assigned to this specific Thrust
+        $evaluatorEmails = ProjectEvaluator::where('project_thrusts_id', $validated['project_thrusts_id'])
+            ->pluck('email');
+
+        // Find the actual User account IDs that match those emails
+        $userIds = User::whereIn('email', $evaluatorEmails)
+            ->pluck('id')
+            ->toArray();
+
+        // Auto-assign them to the project via the pivot table
+        // sync() automatically adds new assignments and drops unselected ones cleanly
+        $project->evaluators()->sync($userIds);
 
         return response()->json([
             'status'  => 'success',

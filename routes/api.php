@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\Admin\DashboardController;
 use App\Http\Controllers\Api\Admin\ProjectController;
+use App\Http\Controllers\Api\Admin\ProjectEvaluatorController;
 use App\Http\Controllers\Api\Admin\ProjectMemberController;
 use App\Http\Controllers\Api\Admin\ProjectThrustController;
 use App\Http\Controllers\Api\Admin\UserManagementController;
@@ -17,6 +18,11 @@ Route::post('/login', [AuthController::class, 'authenticate']);
 
 // Inside your authenticated admin route group middleware...
 Route::middleware(['auth:sanctum'])->prefix('admin')->group(function () {
+
+    Route::get('/evaluators', [ProjectEvaluatorController::class, 'index']);
+    Route::post('/evaluators', [ProjectEvaluatorController::class, 'store']);
+    Route::put('/evaluators/{id}', [ProjectEvaluatorController::class, 'update']);
+    Route::delete('/evaluators/{id}', [ProjectEvaluatorController::class, 'destroy']);
 
     Route::post('projects/{id}/assign-evaluators', [ProjectController::class, 'assignEvaluators']);
 
@@ -38,6 +44,10 @@ Route::middleware(['auth:sanctum'])->prefix('admin')->group(function () {
 });
 
 Route::middleware(['auth:sanctum'])->prefix('evaluator')->group(function () {
+
+    Route::get('/members-rating', [EvaluatorDashboardController::class, 'getMembersRating']);
+    Route::get('/thrusts', [EvaluatorDashboardController::class, 'getEvaluatorsThrust']);
+
     Route::get('/dashboard-metrics', [EvaluatorDashboardController::class, 'index']);
     Route::get('/projects', [EvaluationController::class, 'getAssignedProjects']);
     Route::get('/projects/{id}/evaluation-form', [EvaluationController::class, 'getFormStructure']);

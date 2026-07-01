@@ -14,7 +14,10 @@ class UserManagementController extends Controller
     // 1. LIST ALL USERS
     public function index(): JsonResponse
     {
-        $users = User::select('id', 'name', 'email', 'role', 'created_at')
+        $users = User::select('id', 'name', 'email', 'role', 'label', 'created_at')
+            ->when(request()->label != 'admin', function ($query, $label) {
+                $query->where('label', '=', $label);
+            })
             ->latest()
             ->get();
 
@@ -31,7 +34,8 @@ class UserManagementController extends Controller
             'name'     => 'required|string|max:255',
             'email'    => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8',
-            'role'     => ['required', Rule::in(['admin', 'evaluator'])]
+            'role'     => ['required', Rule::in(['admin', 'evaluator'])],
+            'label'     => 'required'
         ]);
 
         $validated['password'] = Hash::make($validated['password']);
@@ -47,7 +51,7 @@ class UserManagementController extends Controller
 
     public function show($id): JsonResponse
     {
-        $user = User::select('id', 'name', 'email', 'role', 'created_at')->findOrFail($id);
+        $user = User::select('id', 'name', 'email', 'role', 'label', 'created_at')->findOrFail($id);
 
         return response()->json([
             'status' => 'success',
@@ -64,7 +68,8 @@ class UserManagementController extends Controller
             'name'     => 'required|string|max:255',
             'email'    => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
             'password' => 'nullable|string|min:8',
-            'role'     => ['required', Rule::in(['admin', 'evaluator'])]
+            'role'     => ['required', Rule::in(['admin', 'evaluator'])],
+            'label' => 'required'
         ]);
 
         if (!empty($validated['password'])) {

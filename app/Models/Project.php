@@ -17,7 +17,8 @@ class Project extends Model
         'title',
         'project_thrusts_id',
         'unit_center',
-        'attachment_path'
+        'attachment_path',
+        'label'
     ];
 
     /**
@@ -51,5 +52,18 @@ class Project extends Model
     public function evaluations(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(Evaluations::class);
+    }
+
+    public function evaluationScores()
+    {
+        // A project has many scores through evaluations
+        return $this->hasManyThrough(
+            EvaluationScores::class, // The final table (scores)
+            Evaluations::class,      // The intermediate table (evaluations)
+            'project_id',           // Foreign key on evaluations table
+            'evaluation_id',        // Foreign key on evaluation_scores table
+            'id',                   // Local key on projects table
+            'id'                    // Local key on evaluations table
+        );
     }
 }

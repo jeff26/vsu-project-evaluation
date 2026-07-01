@@ -11,11 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('project_user', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('project_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete(); // The assigned evaluator
-            //$table->timestamps();
+        Schema::table('project_thrusts', function (Blueprint $table) {
+            $table->char('label', 30)->nullable();
         });
     }
 
@@ -24,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('project_user');
+        Schema::table('project_thrusts', function (Blueprint $table) {
+            $table->dropColumn('label');
+        });
     }
 };

@@ -9,6 +9,7 @@ use App\Models\Evaluations;
 use App\Models\EvaluationCategories;
 use App\Models\EvaluationScores;
 use App\Models\ProjectMember;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
@@ -46,6 +47,7 @@ class EvaluationController extends Controller
     public function getFormStructure($projectId): JsonResponse
     {
         $evaluatorId = auth()->id();
+        $User = User::query()->where('id', '=', $evaluatorId)->first();
 
         // 1. Guard check: Ensure target project existence
         $projectExists = Project::where('id', $projectId)->exists();
@@ -57,7 +59,7 @@ class EvaluationController extends Controller
         }
 
         // 2. Fetch the entire grading template framework sorted cleanly
-        $categories = EvaluationCategories::with(['criteria' => function ($query) {
+        $categories = EvaluationCategories::where('label', $User->label)->with(['criteria' => function ($query) {
             $query->orderBy('id', 'asc');
         }])->orderBy('id', 'asc')->get();
 
@@ -75,7 +77,6 @@ class EvaluationController extends Controller
         }
 
         $projectLeader = ProjectMember::where('project_id', $projectId)
-            ->where('role', 'leader')
             ->first();
 
         return response()->json([

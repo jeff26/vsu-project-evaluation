@@ -49,7 +49,7 @@
                             <button @click="openEditModal(u)" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg transition-colors cursor-pointer">
                                 Modify
                             </button>
-                            <button @click="deleteUser(u.id)" class="text-xs bg-red-50 hover:bg-red-600 text-red-700 hover:text-white px-3 py-1.5 rounded-lg transition-colors cursor-pointer">
+                            <button v-if="u.role !== 'evaluator'" @click="deleteUser(u.id)" class="text-xs bg-red-50 hover:bg-red-600 text-red-700 hover:text-white px-3 py-1.5 rounded-lg transition-colors cursor-pointer">
                                 Drop
                             </button>
                         </td>
@@ -67,16 +67,23 @@
                     </h3>
                     <button @click="showModal = false" class="text-slate-400 hover:text-slate-600 font-bold text-lg cursor-pointer">&times;</button>
                 </div>
-
+                <div v-if="isEvaluator" class="mx-5 p-3 bg-amber-50 border-l-4 border-amber-400 rounded-r-lg flex gap-3 items-start">
+                    <svg class="w-5 h-5 text-amber-500 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                    </svg>
+                    <p class="text-xs text-amber-800 leading-relaxed">
+                        <strong>Restricted Access:</strong> If the Role is Evaluator, Profile details are managed in the <em>Project Evaluator</em> menu. Only the password can be modified here.
+                    </p>
+                </div>
                 <form @submit.prevent="saveUser" class="p-5 space-y-4">
                     <div>
                         <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Full Name</label>
-                        <input v-model="form.name" type="text" required class="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-hidden focus:border-emerald-700" />
+                        <input :disabled="isEvaluator" v-model="form.name" type="text" required class="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-hidden focus:border-emerald-700" />
                     </div>
 
                     <div>
                         <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Email Address</label>
-                        <input v-model="form.email" type="email" required class="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-hidden focus:border-emerald-700" />
+                        <input :disabled="isEvaluator" v-model="form.email" type="email" required class="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-hidden focus:border-emerald-700" />
                     </div>
 
                     <div>
@@ -87,10 +94,10 @@
                     </div>
 
                     <div>
-                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Role Authority Clearance</label>
-                        <select v-model="form.role" class="w-full px-3 py-2 text-sm border border-slate-200 bg-white rounded-lg focus:outline-hidden focus:border-emerald-700 font-medium">
-                            <option value="evaluator">Evaluator</option>
-                            <option value="admin">Admin (System Infrastructure Manager)</option>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Label</label>
+                        <select :disabled="isEvaluator" v-model="form.label" class="w-full px-3 py-2 text-sm border border-slate-200 bg-white rounded-lg focus:outline-hidden focus:border-emerald-700 font-medium">
+                            <option value="research">Research</option>
+                            <option value="extension">Extension</option>
                         </select>
                     </div>
 
@@ -114,16 +121,17 @@ const users = ref([]);
 const loading = ref(true);
 const showModal = ref(false);
 const isEditMode = ref(false);
+let isEvaluator = false;
 const targetUserId = ref(null);
 const feedback = ref('');
 
-const form = ref({ name: '', email: '', password: '', role: 'evaluator' });
+const form = ref({ name: '', email: '', password: '', role: 'admin', label: '' });
 const token = localStorage.getItem('auth_token');
-
+const user = JSON.parse(localStorage.getItem('user_profile')) || null;
 const fetchUsers = async () => {
     try {
         loading.value = true;
-        const response = await axios.get('/api/admin/users', { headers: { Authorization: `Bearer ${token}` } });
+        const response = await axios.get('/api/admin/users', { headers: { Authorization: `Bearer ${token}` }, params: { label: user.label } });
         if (response.data.status === 'success') users.value = response.data.data;
     } catch (err) {
         console.error('Failed processing index arrays:', err);
@@ -132,14 +140,16 @@ const fetchUsers = async () => {
 
 const openCreateModal = () => {
     isEditMode.value = false;
-    form.value = { name: '', email: '', password: '', role: 'evaluator' };
+    form.value = { name: '', email: '', password: '', role: 'admin', label: '' };
     showModal.value = true;
 };
 
 const openEditModal = (user) => {
+    isEvaluator = user.role === 'evaluator';
+    // console.log(isEvaluator);
     isEditMode.value = true;
     targetUserId.value = user.id;
-    form.value = { name: user.name, email: user.email, password: '', role: user.role };
+    form.value = { name: user.name, email: user.email, password: '', role: user.role, label: user.label };
     showModal.value = true;
 };
 
@@ -173,7 +183,7 @@ const deleteUser = async (id) => {
         });
         if (response.data.status === 'success') {
             feedback.value = response.data.message;
-            fetchUsers();
+            await fetchUsers();
             setTimeout(() => feedback.value = '', 4000);
         }
     } catch (err) {

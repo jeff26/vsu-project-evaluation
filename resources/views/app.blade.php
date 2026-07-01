@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Project Evaluation System</title>
+    <link rel="shortcut icon" href="/images/vsu_logo_official.png">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>

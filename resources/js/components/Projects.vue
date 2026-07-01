@@ -96,7 +96,7 @@
                         </td>
 
                         <td class="py-4 px-6 text-right space-x-2 whitespace-nowrap">
-                            <button @click="openEvaluatorModal(project)" class="text-amber-700 hover:text-amber-900 bg-amber-50 hover:bg-amber-100 text-xs font-bold px-2.5 py-1.5 rounded-lg transition-colors cursor-pointer">Panel Setup</button>
+                            <button @click="openEvaluatorModal(project)" class="text-amber-700 hover:text-amber-900 bg-amber-50 hover:bg-amber-100 text-xs font-bold px-2.5 py-1.5 rounded-lg transition-colors cursor-pointer">Evaluators</button>
                             <button @click="openEditModal(project)" class="text-emerald-700 hover:text-emerald-900 bg-emerald-50 hover:bg-emerald-100 text-xs font-bold px-2.5 py-1.5 rounded-lg transition-colors cursor-pointer">Modify</button>
                             <button @click="deleteProject(project.id)" class="text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 text-xs font-bold px-2.5 py-1.5 rounded-lg transition-colors cursor-pointer">Delete</button>
                         </td>
@@ -121,7 +121,7 @@
 
                 <form @submit.prevent="saveProject" class="p-6 space-y-4">
                     <div>
-                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Project Scope / Title</label>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Project Title</label>
                         <textarea
                             v-model="form.title"
                             required
@@ -146,7 +146,7 @@
                     </div>
 
                     <div>
-                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Assigned Operations Center Unit</label>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Implementing Unit</label>
                         <input
                             v-model="form.unit_center"
                             type="text"
@@ -156,7 +156,7 @@
                     </div>
 
                     <div>
-                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Supporting Document (PDF)</label>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Annual Report (PDF)</label>
                         <input
                             type="file"
                             accept="application/pdf"
@@ -252,7 +252,10 @@ const targetProjectForEvaluator = ref(null);
 const expandedProjectIds = ref([]);
 
 const token = localStorage.getItem('auth_token');
-const config = { headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' } };
+const userProfile = localStorage.getItem('user_profile');
+const user = userProfile ? JSON.parse(userProfile) : null;
+// console.log(user);
+const config = { headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' }, params: { label: user.label } };
 
 // 🌟 ADDED: Accordion view controllers
 const toggleEvaluators = (projectId) => {
@@ -356,7 +359,7 @@ const fetchProjects = async () => {
         loading.value = true;
         const response = await axios.get('/api/admin/projects', {
             headers: { Authorization: `Bearer ${token}` },
-            params: { search: searchQuery.value, thrust_id: selectedThrust.value }
+            params: { search: searchQuery.value, thrust_id: selectedThrust.value, label: user.label }
         });
         projects.value = response.data;
     } catch (error) {
@@ -373,6 +376,7 @@ const saveProject = async () => {
         formData.append('title', form.value.title);
         formData.append('project_thrusts_id', form.value.project_thrusts_id);
         formData.append('unit_center', form.value.unit_center);
+        formData.append('label', user.label);
 
         // 3. Append the PDF file ONLY if the user actually selected one
         if (form.value.attachment) {

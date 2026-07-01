@@ -115,6 +115,13 @@
                             class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-hidden focus:border-emerald-600 focus:bg-white transition-all text-slate-800 resize-none"
                         ></textarea>
                     </div>
+                    <div v-if="isAdminLabel">
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Label</label>
+                        <select v-model="form.label" class="w-full px-3 py-2 text-sm border border-slate-200 bg-white rounded-lg focus:outline-hidden focus:border-emerald-700 font-medium">
+                            <option value="research">Research</option>
+                            <option value="extension">Extension</option>
+                        </select>
+                    </div>
 
                     <div class="pt-4 border-t border-slate-100 flex justify-end space-x-2">
                         <button
@@ -153,8 +160,12 @@ const isModalOpen = ref(false);
 const isEditMode = ref(false);
 const currentEditingId = ref(null);
 const form = ref({
-    name: ''
+    name: '',
+    label: ''
 });
+const userProfile = localStorage.getItem('user_profile');
+const user = userProfile ? JSON.parse(userProfile) : null;
+let isAdminLabel = user.label === 'admin';
 
 // Fetch Listing Records through the API utilizing standard search parameters
 const fetchThrusts = async () => {
@@ -164,7 +175,7 @@ const fetchThrusts = async () => {
 
         const response = await axios.get('/api/admin/thrusts', {
             headers: { Authorization: `Bearer ${token}` },
-            params: { search: searchQuery.value } // 🌟 backend when() integration
+            params: { search: searchQuery.value, label: user.label } // 🌟 backend when() integration
         });
 
         thrusts.value = response.data;
@@ -191,7 +202,7 @@ const openAddModal = () => {
     isEditMode.value = false;
     currentEditingId.value = null;
     errorMessage.value = '';
-    form.value = { name: '' };
+    form.value = { name: '', label: isAdminLabel ? '' : user.label };
     isModalOpen.value = true;
 };
 
@@ -199,7 +210,7 @@ const openEditModal = (thrust) => {
     isEditMode.value = true;
     currentEditingId.value = thrust.id;
     errorMessage.value = '';
-    form.value = { name: thrust.name };
+    form.value = { name: thrust.name, label: thrust.label };
     isModalOpen.value = true;
 };
 
