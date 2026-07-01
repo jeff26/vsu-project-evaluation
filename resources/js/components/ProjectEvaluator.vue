@@ -131,9 +131,10 @@ const errorMessage = ref('');
 const isModalOpen = ref(false);
 const isEditMode = ref(false);
 const currentEditingId = ref(null);
-const form = ref({ project_thrusts_id: '', name: '', email: '', role: 'Member' });
 const userProfile = localStorage.getItem('user_profile');
 const user = userProfile ? JSON.parse(userProfile) : null;
+
+const form = ref({ project_thrusts_id: '', name: '', email: '', role: 'Member', label: '' });
 
 const activeThrustName = computed(() => {
     const thrust = thrustOptions.value.find(t => t.id === selectedThrustId.value);
@@ -172,7 +173,7 @@ const fetchEvaluators = async () => {
 
 const openAddModal = () => {
     isEditMode.value = false;
-    form.value = { project_thrusts_id: selectedThrustId.value, name: '', email: '', role: 'Member' };
+    form.value = { project_thrusts_id: selectedThrustId.value, name: '', email: '', role: 'Member', label: user.label };
     errorMessage.value = '';
     isModalOpen.value = true;
 };

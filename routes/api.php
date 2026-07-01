@@ -45,6 +45,7 @@ Route::middleware(['auth:sanctum'])->prefix('admin')->group(function () {
 
 Route::middleware(['auth:sanctum'])->prefix('evaluator')->group(function () {
 
+    Route::get('/over-all-rating', [EvaluatorDashboardController::class, 'getOverAllRating']);
     Route::get('/members-rating', [EvaluatorDashboardController::class, 'getMembersRating']);
     Route::get('/thrusts', [EvaluatorDashboardController::class, 'getEvaluatorsThrust']);
 

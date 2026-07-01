@@ -192,8 +192,29 @@
                 </table>
             </div>
 
-            <div v-if="activeTab === 'overall'" class="p-10 text-center border-2 border-dashed border-slate-200 rounded-xl text-slate-400">
-                Overall Project Rating View (Coming Soon)
+            <div v-if="activeTab === 'overall'" class="bg-white rounded-xl border border-slate-200/60 shadow-xs overflow-hidden">
+                <table class="w-full text-left text-sm text-slate-600 border-collapse">
+                    <thead class="bg-slate-50 border-b border-slate-200 text-slate-700 text-xs font-bold uppercase tracking-wider">
+                    <tr>
+                        <th class="py-3 px-5">Project Title</th>
+                        <th class="py-3 px-5">Implementing Unit</th>
+                        <th class="py-3 px-5">Over all Rating</th>
+                    </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 font-medium">
+                    <tr v-for="project in overAllRating" :key="project.id" class="hover:bg-slate-50/60 transition-colors">
+                        <td class="py-4 px-5 text-slate-900 font-bold max-w-xs sm:max-w-md truncate">
+                            {{ project.title }}
+                        </td>
+                        <td class="py-4 px-5 text-slate-500 text-xs">
+                            {{ project.unit_center }}
+                        </td>
+                        <td class="py-4 px-5">
+                            {{ project.evaluation_scores_avg_rating ? parseFloat(project.evaluation_scores_avg_rating).toFixed(2)  + '%': 'No Rating' }}
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -210,6 +231,7 @@ const selectedProjects = ref('');
 const thrustOptions = ref([]);
 const selectedThrust = ref('');
 const membersRating = ref([]);
+const overAllRating = ref([]);
 const loading = ref(true);
 const activeTab = ref('assigned'); // Default tab
 
@@ -250,6 +272,7 @@ const loadDashboardData = async () => {
 
                 await fetchProjects();
                 await fetchMembersRating();
+                await fetchOverAllRating();
             }
         }
     } catch (error) {
@@ -280,6 +303,19 @@ const fetchMembersRating = async () => {
             params: { project_id: selectedProjects.value, thrust_id: thrust_id, label: user.label }
         });
         membersRating.value = response.data.data;
+    } catch (error) {
+        console.error('Failed to resolve data repository context items:', error);
+    } finally { loading.value = false; }
+};
+
+const fetchOverAllRating = async () => {
+    try {
+        loading.value = true;
+        const response = await axios.get('/api/evaluator/over-all-rating', {
+            headers: { Authorization: `Bearer ${token}` },
+            params: { thrust_id: thrust_id, label: user.label }
+        });
+        overAllRating.value = response.data.data;
     } catch (error) {
         console.error('Failed to resolve data repository context items:', error);
     } finally { loading.value = false; }

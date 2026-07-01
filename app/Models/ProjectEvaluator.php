@@ -25,6 +25,7 @@ class ProjectEvaluator extends Model
                     'name' => $evaluator->name,
                     'password' => Hash::make('secret'),
                     'role' => 'evaluator',
+                    'label' => request()->label
                 ]
             );
         });

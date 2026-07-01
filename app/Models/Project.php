@@ -64,6 +64,6 @@ class Project extends Model
             'evaluation_id',        // Foreign key on evaluation_scores table
             'id',                   // Local key on projects table
             'id'                    // Local key on evaluations table
-        );
+        )->where('evaluations.status', '=', 'completed');
     }
 }

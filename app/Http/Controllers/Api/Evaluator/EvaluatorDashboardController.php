@@ -111,4 +111,21 @@ class EvaluatorDashboardController extends Controller
             'data' => $data
         ], 200);
     }
+
+    public function getOverAllRating(Request $request): JsonResponse
+    {
+        // Validate
+        $request->validate([
+            'thrust_id' => 'required|exists:project_thrusts,id'
+        ]);
+
+        $thrust_id = $request->input('thrust_id');
+
+        $projects = Project::where('project_thrusts_id', '=', $thrust_id)->withAvg('evaluationScores', 'rating')->get();
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $projects
+        ], 200);
+    }
 }
